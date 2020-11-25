@@ -1,6 +1,7 @@
 [package]
 name = "waysmoke-pkagent"
 version = "2020.5.0"
+license = "Unlicense"
 authors = ["Val Packett <val@packett.cool>"]
 edition = "2018"
 
