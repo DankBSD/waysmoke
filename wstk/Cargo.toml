@@ -6,20 +6,20 @@ authors = ["Val Packett <val@packett.cool>"]
 edition = "2018"
 
 # [build-dependencies]
-# wayland-scanner = "0.28"
+# wayland-scanner = "0.29"
 
 [dependencies]
 # byteorder = "1"
 # typemap = "0.3"
 raw-window-handle = "0.3"
-# wayland-commons = "0.28"
-wayland-client = { version = "0.28", features = ["use_system_lib"] }
-smithay-client-toolkit = { version = "0.14", default-features = false }
+# wayland-commons = "0.29"
+wayland-client = { version = "0.29", features = ["use_system_lib"] }
+smithay-client-toolkit = { version = "0.15", default-features = false }
 event-listener = "2"
 
 async-trait = "0.1"
 futures = "0.3"
-glib = "=0.14.0"
+glib = "=0.15.0"
 
 # patch: damage, image-debloat, GLib loop instead of conflicting local executor
 iced_core =     { git = "https://github.com/unrelentingtech/iced" }
@@ -33,5 +33,3 @@ iced_native =   { git = "https://github.com/unrelentingtech/iced" }
 # iced_wgpu =     { path = "../../../hecrj/iced/wgpu", features = ["default_system_font", "svg", "png"] }
 # iced_graphics = { path = "../../../hecrj/iced/graphics" }
 # iced_native =   { path = "../../../hecrj/iced/native" }
-
-funty = "=1.1.0" # https://github.com/bitvecto-rs/bitvec/issues/105

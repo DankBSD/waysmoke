@@ -293,7 +293,7 @@ impl DesktopSurface for AuthDialog {
                 | layer_surface::Anchor::Bottom,
         );
         layer_surface.set_exclusive_zone(-1);
-        layer_surface.set_keyboard_interactivity(1);
+        layer_surface.set_keyboard_interactivity(layer_surface::KeyboardInteractivity::Exclusive);
     }
 }
 

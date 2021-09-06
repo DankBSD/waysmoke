@@ -147,7 +147,6 @@ pub struct IcedInstance<T: IcedSurface> {
     compositor: WgpuCompositor,
     renderer: <WgpuCompositor as Compositor>::Renderer,
     gpu_surface: <WgpuCompositor as Compositor>::Surface,
-    swap_chain: Option<<WgpuCompositor as Compositor>::SwapChain>,
     prev_prim: iced_graphics::Primitive,
     queue: Vec<iced_native::Event>,
     messages: Vec<T::Message>,
@@ -224,7 +223,6 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
             compositor,
             renderer,
             gpu_surface,
-            swap_chain: None,
             prev_prim: iced_graphics::Primitive::None,
             queue: Vec::new(),
             messages: Vec::new(),
@@ -285,19 +283,12 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
     }
 
     async fn render(&mut self) {
-        if self.swap_chain.is_none() {
-            eprintln!("WARN: render attempted without swapchain");
-            return;
-        }
-
         for h in self.surface.retained_images() {
             match h {
                 ImageHandle::Raster(h) => self.renderer.backend_mut().retain_raster(&h),
                 ImageHandle::Vector(h) => self.renderer.backend_mut().retain_vector(&h),
             }
         }
-
-        let swap_chain = self.swap_chain.as_mut().unwrap();
 
         let mut user_interface =
             UserInterface::build(self.surface.view(), self.size, self.cache.clone(), &mut self.renderer);
@@ -325,14 +316,17 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
                 self.update_input_region();
                 return;
             }
-            let inter = self.compositor.draw::<String>(
-                &mut self.renderer,
-                swap_chain,
-                &viewport,
-                iced_core::Color::TRANSPARENT,
-                &(primitive, mi),
-                &[],
-            );
+            let inter = self
+                .compositor
+                .draw::<String>(
+                    &mut self.renderer,
+                    &mut self.gpu_surface,
+                    &viewport,
+                    iced_core::Color::TRANSPARENT,
+                    &(primitive, mi),
+                    &[],
+                )
+                .unwrap();
             self.cache = user_interface.into_cache();
             self.apply_mouse_interaction(inter);
         } else {
@@ -353,26 +347,29 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
                 self.cache = user_interface.into_cache();
                 return;
             }
-            let inter = self.compositor.draw::<String>(
-                &mut self.renderer,
-                swap_chain,
-                &viewport,
-                iced_core::Color::TRANSPARENT,
-                &(primitive, mi),
-                &[],
-            );
+            let inter = self
+                .compositor
+                .draw::<String>(
+                    &mut self.renderer,
+                    &mut self.gpu_surface,
+                    &viewport,
+                    iced_core::Color::TRANSPARENT,
+                    &(primitive, mi),
+                    &[],
+                )
+                .unwrap();
             self.cache = user_interface.into_cache();
             self.apply_mouse_interaction(inter);
         }
         self.update_input_region();
     }
 
-    fn create_swap_chain(&mut self) {
-        self.swap_chain = Some(self.compositor.create_swap_chain(
-            &self.gpu_surface,
+    fn configure_surface(&mut self) {
+        self.compositor.configure_surface(
+            &mut self.gpu_surface,
             self.size.width as u32 * self.scale as u32,
             self.size.height as u32 * self.scale as u32,
-        ));
+        );
         self.parent.wl_surface.set_buffer_scale(self.scale);
         self.prev_prim = iced_graphics::Primitive::None; // force damage
     }
@@ -382,7 +379,7 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
             return;
         }
         self.scale = scale;
-        self.create_swap_chain();
+        self.configure_surface();
         self.render().await;
     }
 
@@ -393,7 +390,7 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
 
                 self.scale = get_surface_scale_factor(&self.parent.wl_surface);
                 self.size = Size::new(width as f32, height as f32);
-                self.create_swap_chain();
+                self.configure_surface();
                 self.render().await;
                 true
             }
@@ -424,11 +421,22 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
                 if !self.kb_active {
                     return;
                 }
-                self.keyboard_mods = keyboard::Modifiers {
-                    shift: modifiers.shift,
-                    control: modifiers.ctrl,
-                    alt: modifiers.alt,
-                    logo: modifiers.logo,
+                self.keyboard_mods = if modifiers.shift {
+                    keyboard::Modifiers::SHIFT
+                } else {
+                    keyboard::Modifiers::empty()
+                } | if modifiers.ctrl {
+                    keyboard::Modifiers::CTRL
+                } else {
+                    keyboard::Modifiers::empty()
+                } | if modifiers.alt {
+                    keyboard::Modifiers::ALT
+                } else {
+                    keyboard::Modifiers::empty()
+                } | if modifiers.logo {
+                    keyboard::Modifiers::LOGO
+                } else {
+                    keyboard::Modifiers::empty()
                 };
                 self.queue
                     .push(iced_native::Event::Keyboard(keyboard::Event::ModifiersChanged(
@@ -475,12 +483,7 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
         if !self.kb_active {
             return;
         }
-        let modifiers = keyboard::Modifiers {
-            shift: false,
-            control: true,
-            alt: false,
-            logo: false,
-        };
+        let modifiers = keyboard::Modifiers::CTRL;
         self.queue
             .push(iced_native::Event::Keyboard(keyboard::Event::ModifiersChanged(
                 modifiers,
