@@ -139,6 +139,7 @@ pub struct IcedInstance<T: IcedSurface> {
     touch: Option<AsyncMain<wl_touch::WlTouch>>,
 
     // iced render state
+    configured: bool,
     cache: Cache,
     size: Size,
     cursor_position: Point,
@@ -216,6 +217,7 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
             keyboard_events,
             ptr,
             touch,
+            configured: false,
             cache: Cache::new(),
             size: Size::new(0.0, 0.0),
             cursor_position: Point::default(),
@@ -283,6 +285,10 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
     }
 
     async fn render(&mut self) {
+        if !self.configured {
+            return
+        }
+
         for h in self.surface.retained_images() {
             match h {
                 ImageHandle::Raster(h) => self.renderer.backend_mut().retain_raster(&h),
@@ -372,6 +378,7 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
         );
         self.parent.wl_surface.set_buffer_scale(self.scale);
         self.prev_prim = iced_graphics::Primitive::None; // force damage
+        self.configured = true;
     }
 
     async fn on_scale(&mut self, scale: i32) {
