@@ -395,10 +395,14 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
             layer_surface::Event::Configure { serial, width, height } => {
                 self.parent.layer_surface.ack_configure(serial);
 
-                self.scale = get_surface_scale_factor(&self.parent.wl_surface);
-                self.size = Size::new(width as f32, height as f32);
-                self.configure_surface();
-                self.render().await;
+                let new_scale = get_surface_scale_factor(&self.parent.wl_surface);
+                let new_size = Size::new(width as f32, height as f32);
+                if new_scale != self.scale || new_size != self.size {
+                    self.scale = new_scale;
+                    self.size = new_size;
+                    self.configure_surface();
+                    self.render().await;
+                }
                 true
             }
             layer_surface::Event::Closed { .. } => false,
