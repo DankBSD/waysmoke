@@ -286,7 +286,7 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
 
     async fn render(&mut self) {
         if !self.configured {
-            return
+            return;
         }
 
         for h in self.surface.retained_images() {

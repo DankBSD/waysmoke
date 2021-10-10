@@ -1,5 +1,6 @@
 use crate::{dock::*, style};
 use gio::prelude::AppInfoExt;
+use iced_native::alignment::{Horizontal, Vertical};
 use std::cell::Ref;
 
 lazy_static::lazy_static! {
@@ -95,7 +96,7 @@ impl Docklet for AppDocklet {
                         &mut btns.pause,
                         Container::new(icons::icon_widget(PAUSE_ICON.clone(), ICON_SIZE / 2))
                             .height(Length::Fill)
-                            .align_y(Align::Center),
+                            .align_y(Vertical::Center),
                     )
                     .on_press(DockletMsg::App(Msg::MediaControl(i, "Pause")))
                 } else {
@@ -103,7 +104,7 @@ impl Docklet for AppDocklet {
                         &mut btns.play,
                         Container::new(icons::icon_widget(PLAY_ICON.clone(), ICON_SIZE / 2))
                             .height(Length::Fill)
-                            .align_y(Align::Center),
+                            .align_y(Vertical::Center),
                     )
                     .on_press(DockletMsg::App(Msg::MediaControl(i, "Play")))
                 }
@@ -157,7 +158,7 @@ impl Docklet for AppDocklet {
         }
         let title = Text::new(self.app.info.name().to_string())
             .width(Length::Fill)
-            .horizontal_alignment(HorizontalAlignment::Center)
+            .horizontal_alignment(Horizontal::Center)
             .size(16);
         Some(
             Column::new()
@@ -176,7 +177,10 @@ impl Docklet for AppDocklet {
                     topl.handle.activate(&self.services.seat);
                     return;
                 }
-                self.app.info.launch::<gio::AppLaunchContext>(&[], None).unwrap()
+                self.app
+                    .info
+                    .launch(&[], None as Option<&gio::AppLaunchContext>)
+                    .unwrap()
             }
             DockletMsg::App(Msg::ActivateToplevel(topli)) => {
                 our_toplevels(&self.services.toplevels.state(), &self.app.id)

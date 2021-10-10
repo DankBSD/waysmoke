@@ -84,7 +84,7 @@ fn popover<'a>(icon_offset: i16, content: Element<'a, Msg>, popover_region: &'a 
     let content_col = GetRegion::new(
         popover_region,
         Column::new()
-            .align_items(Align::Center)
+            .align_items(Alignment::Center)
             .push(content_box)
             .push(triangle),
     );
@@ -101,7 +101,7 @@ fn popover<'a>(icon_offset: i16, content: Element<'a, Msg>, popover_region: &'a 
         .width(Length::Fill)
         .height(Length::Units(POPOVER_HEIGHT_MAX))
         .center_x()
-        .align_y(Align::End)
+        .align_y(alignment::Vertical::Bottom)
         .into()
 }
 
@@ -245,7 +245,7 @@ impl IcedSurface for Dock {
 
         if self.is_pointed || self.is_touched {
             let row = self.docklets().enumerate().fold(
-                Row::new().align_items(Align::Center).spacing(DOCK_PADDING),
+                Row::new().align_items(Alignment::Center).spacing(DOCK_PADDING),
                 |row, (i, docklet)| {
                     row.push(
                         unsafe { &mut *(docklet as *const dyn Docklet as *mut dyn Docklet) }

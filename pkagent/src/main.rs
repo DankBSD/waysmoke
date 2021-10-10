@@ -2,7 +2,7 @@ use futures::{channel::mpsc, prelude::*};
 use glib::clone;
 use std::{
     cell::{Cell, RefCell},
-    collections::{HashMap, VecDeque},
+    collections::HashMap,
     convert::TryInto,
     rc::Rc,
 };
@@ -306,7 +306,7 @@ impl IcedSurface for AuthDialog {
 
         let title = Text::new(self.st.req.message.clone())
             .size(20)
-            .horizontal_alignment(HorizontalAlignment::Center);
+            .horizontal_alignment(alignment::Horizontal::Center);
 
         let mut elems = Column::new().spacing(16).push(title);
 
@@ -326,7 +326,7 @@ impl IcedSurface for AuthDialog {
                 }
                 DialogElement::Prompt { txt, echo_on, done } => {
                     let mut row = Row::new()
-                        .align_items(Align::Center)
+                        .align_items(Alignment::Center)
                         .spacing(8)
                         .push(Text::new(txt.clone()).size(18));
                     if !done {
@@ -355,7 +355,7 @@ impl IcedSurface for AuthDialog {
                         &mut self.cancel_btn,
                         Text::new("Cancel")
                             .size(18)
-                            .horizontal_alignment(HorizontalAlignment::Center),
+                            .horizontal_alignment(alignment::Horizontal::Center),
                     )
                     .on_press(Msg::CancelResponse)
                     .width(Length::Fill)
@@ -366,7 +366,7 @@ impl IcedSurface for AuthDialog {
                         &mut self.submit_btn,
                         Text::new("OK")
                             .size(18)
-                            .horizontal_alignment(HorizontalAlignment::Center),
+                            .horizontal_alignment(alignment::Horizontal::Center),
                     )
                     .on_press(Msg::SubmitResponse)
                     .width(Length::Fill)

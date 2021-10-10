@@ -10,7 +10,7 @@ async fn main_(env: &Environment<Env>, display: &Display) {
         Some("technology.unrelenting.waysmoke.Shell"),
         gio::ApplicationFlags::default(),
     );
-    app.register::<gio::Cancellable>(None).unwrap();
+    app.register(None as Option<&gio::Cancellable>).unwrap();
     let session_bus = app.dbus_connection().unwrap();
 
     let services: &'static _ = Box::leak(Box::new(svc::Services {

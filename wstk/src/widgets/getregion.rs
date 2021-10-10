@@ -7,8 +7,8 @@ pub struct GetRegion<'a, Message, Renderer: self::Renderer> {
     // The Cell helps both with the immutable &self in layout(), and with multi-borrows in the consumer
     state: &'a Cell<Rectangle>,
     content: Element<'a, Message, Renderer>,
-    horizontal_alignment: Align,
-    vertical_alignment: Align,
+    horizontal_alignment: Alignment,
+    vertical_alignment: Alignment,
 }
 
 impl<'a, Message, Renderer> GetRegion<'a, Message, Renderer>
@@ -22,18 +22,18 @@ where
         GetRegion {
             state,
             content: content.into(),
-            horizontal_alignment: Align::Start,
-            vertical_alignment: Align::Start,
+            horizontal_alignment: Alignment::Start,
+            vertical_alignment: Alignment::Start,
         }
     }
 
     pub fn center_x(mut self) -> Self {
-        self.horizontal_alignment = Align::Center;
+        self.horizontal_alignment = Alignment::Center;
         self
     }
 
     pub fn center_y(mut self) -> Self {
-        self.vertical_alignment = Align::Center;
+        self.vertical_alignment = Alignment::Center;
         self
     }
 }
