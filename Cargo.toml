@@ -23,6 +23,9 @@ panic = "abort"
 # wayland-protocols = { git = "https://github.com/Smithay/wayland-rs" }
 # wayland-commons   = { git = "https://github.com/Smithay/wayland-rs" }
 
+# nix dep update
+file-locker = { git = "https://github.com/DankBSD/file-locker", branch = "master" }
+
 gio = { git = "https://github.com/gtk-rs/gtk-rs-core" }
 gio-sys = { git = "https://github.com/gtk-rs/gtk-rs-core" }
 glib = { git = "https://github.com/gtk-rs/gtk-rs-core" }
