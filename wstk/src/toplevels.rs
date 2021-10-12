@@ -28,7 +28,7 @@ impl Hash for ToplevelKey {
     }
 }
 
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct ToplevelState {
     pub handle: toplevel_handle::ZwlrForeignToplevelHandleV1,
     pub title: String,
@@ -104,10 +104,12 @@ impl GlobalHandler<toplevel_manager::ZwlrForeignToplevelManagerV1> for ToplevelS
                     toplevel_handle::Event::OutputLeave { output } => topl.outputs.retain(|o| *o != output),
                     toplevel_handle::Event::State { state } => topl.state = state,
                     toplevel_handle::Event::Done => {
-                        states
-                            .borrow_mut()
-                            .insert(ToplevelKey(topl.handle.clone()), topl.clone());
-                        notifier.notify(usize::MAX);
+                        let mut sts = states.borrow_mut();
+                        let k = ToplevelKey(topl.handle.clone());
+                        if let None | Some(true) = sts.get(&k).map(|v| topl != *v) {
+                            sts.insert(k, topl.clone());
+                            notifier.notify(usize::MAX);
+                        }
                     }
                     toplevel_handle::Event::Closed => {
                         states.borrow_mut().remove(&ToplevelKey(topl.handle.clone()));
