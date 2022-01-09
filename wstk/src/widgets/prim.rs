@@ -42,7 +42,7 @@ where
     }
 
     fn layout(&self, _renderer: &iced_graphics::Renderer<Backend>, limits: &layout::Limits) -> layout::Node {
-        let limits = limits.loose().width(self.width).height(self.height);
+        let limits = limits.width(self.width).height(self.height);
         layout::Node::new(limits.resolve(Size::INFINITY))
     }
 
@@ -53,28 +53,32 @@ where
         _cursor_position: Point,
         _renderer: &iced_graphics::Renderer<Backend>,
         _clipboard: &mut dyn Clipboard,
-        _messages: &mut Vec<Message>,
+        _shell: &mut Shell<'_, Message>,
     ) -> event::Status {
         event::Status::Ignored
     }
 
+    fn mouse_interaction(
+        &self,
+        _layout: Layout<'_>,
+        _cursor_position: Point,
+        _viewport: &Rectangle,
+    ) -> mouse::Interaction {
+        mouse::Interaction::default()
+    }
+
     fn draw(
         &self,
-        _renderer: &mut iced_graphics::Renderer<Backend>,
-        _defaults: &iced_graphics::Defaults,
+        renderer: &mut iced_graphics::Renderer<Backend>,
+        _style: &renderer::Style,
         layout: Layout<'_>,
         _cursor_position: Point,
         _viewport: &Rectangle,
-    ) -> (iced_graphics::Primitive, mouse::Interaction) {
+    ) {
         let b = layout.bounds();
-
-        (
-            iced_graphics::Primitive::Translate {
-                translation: Vector::new(b.x, b.y),
-                content: Box::new(self.primitive.clone()),
-            },
-            mouse::Interaction::default(),
-        )
+        renderer.with_translation(Vector::new(b.x, b.y), |renderer| {
+            renderer.draw_primitive(self.primitive.clone());
+        });
     }
 
     fn hash_layout(&self, state: &mut Hasher) {

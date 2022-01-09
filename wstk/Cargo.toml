@@ -11,7 +11,7 @@ edition = "2018"
 [dependencies]
 # byteorder = "1"
 # typemap = "0.3"
-raw-window-handle = "0.3"
+raw-window-handle = "0.4"
 # wayland-commons = "0.29"
 wayland-client = { version = "0.29", features = ["use_system_lib"] }
 smithay-client-toolkit = { version = "0.15", default-features = false }

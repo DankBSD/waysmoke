@@ -198,44 +198,40 @@ impl MediaService {
             .await,
         ) {
             if let Some(initial_state) = MediaPlayerState::query(&common, &player) {
-                let common_sub = {
+                let common_sub = Some({
                     let state = state.clone();
                     let name = name.clone();
                     let notifier = notifier.clone();
-                    common
-                        .connect_local("g-properties-changed", true, move |args| {
-                            let new_props = args[1]
-                                .get::<glib::Variant>()
-                                .unwrap()
-                                .get::<HashMap<String, glib::Variant>>()
-                                .unwrap();
-                            if let Some(ref mut obj) = state.borrow_mut().get_mut(&name) {
-                                obj.common_update(new_props);
-                            }
-                            notifier.notify(usize::MAX);
-                            None
-                        })
-                        .ok()
-                };
-                let player_sub = {
+                    common.connect_local("g-properties-changed", true, move |args| {
+                        let new_props = args[1]
+                            .get::<glib::Variant>()
+                            .unwrap()
+                            .get::<HashMap<String, glib::Variant>>()
+                            .unwrap();
+                        if let Some(ref mut obj) = state.borrow_mut().get_mut(&name) {
+                            obj.common_update(new_props);
+                        }
+                        notifier.notify(usize::MAX);
+                        None
+                    })
+                });
+                let player_sub = Some({
                     let state = state.clone();
                     let name = name.clone();
                     let notifier = notifier.clone();
-                    player
-                        .connect_local("g-properties-changed", true, move |args| {
-                            let new_props = args[1]
-                                .get::<glib::Variant>()
-                                .unwrap()
-                                .get::<HashMap<String, glib::Variant>>()
-                                .unwrap();
-                            if let Some(ref mut obj) = state.borrow_mut().get_mut(&name) {
-                                obj.player_update(new_props);
-                            }
-                            notifier.notify(usize::MAX);
-                            None
-                        })
-                        .ok()
-                };
+                    player.connect_local("g-properties-changed", true, move |args| {
+                        let new_props = args[1]
+                            .get::<glib::Variant>()
+                            .unwrap()
+                            .get::<HashMap<String, glib::Variant>>()
+                            .unwrap();
+                        if let Some(ref mut obj) = state.borrow_mut().get_mut(&name) {
+                            obj.player_update(new_props);
+                        }
+                        notifier.notify(usize::MAX);
+                        None
+                    })
+                });
                 state.borrow_mut().insert(name.clone(), initial_state);
                 subs.borrow_mut().insert(
                     name,

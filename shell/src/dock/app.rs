@@ -1,6 +1,9 @@
 use crate::{dock::*, style};
 use gio::prelude::AppInfoExt;
-use iced_native::alignment::{Horizontal, Vertical};
+use iced_native::{
+    alignment::{Horizontal, Vertical},
+    widget,
+};
 use std::cell::Ref;
 
 lazy_static::lazy_static! {
@@ -21,18 +24,18 @@ pub enum Msg {
 
 #[derive(Default)]
 struct MediaBtns {
-    play: iced_native::button::State,
-    pause: iced_native::button::State,
+    play: widget::button::State,
+    pause: widget::button::State,
 }
 
 pub struct AppDocklet {
     services: &'static svc::Services,
     app: apps::App,
     icon: wstk::ImageHandle,
-    button: iced_native::button::State,
+    button: widget::button::State,
     evl: addeventlistener::State,
-    toplevels_scrollable: iced_native::scrollable::State,
-    toplevels_buttons: Vec<iced_native::button::State>,
+    toplevels_scrollable: widget::scrollable::State,
+    toplevels_buttons: Vec<widget::button::State>,
     media_buttons: Vec<MediaBtns>,
 }
 

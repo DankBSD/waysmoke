@@ -37,10 +37,10 @@ gobject-sys = { git = "https://github.com/gtk-rs/gtk-rs-core" }
 smithay-client-toolkit = { git = "https://github.com/unrelentingtech/client-toolkit", branch = "master" }
 
 # patch: transparency (composite_alpha_mode: hal::CompositeAlphaMode::PreMultiplied)
-wgpu       = { git = "https://github.com/unrelentingtech/wgpu", branch = "v0.10-alpha" }
-wgpu-hal   = { git = "https://github.com/unrelentingtech/wgpu", branch = "v0.10-alpha" }
-wgpu-core  = { git = "https://github.com/unrelentingtech/wgpu", branch = "v0.10-alpha" }
-wgpu-types = { git = "https://github.com/unrelentingtech/wgpu", branch = "v0.10-alpha" }
+wgpu       = { git = "https://github.com/unrelentingtech/wgpu", branch = "v0.12-alpha" }
+wgpu-hal   = { git = "https://github.com/unrelentingtech/wgpu", branch = "v0.12-alpha" }
+wgpu-core  = { git = "https://github.com/unrelentingtech/wgpu", branch = "v0.12-alpha" }
+wgpu-types = { git = "https://github.com/unrelentingtech/wgpu", branch = "v0.12-alpha" }
 
 # crates.io releases don't have gio/glib versions locked to minor 0 (matching git >_<)
 polkit-sys = { git = "https://github.com/DankBSD/polkit-rs", branch = "trunk" }

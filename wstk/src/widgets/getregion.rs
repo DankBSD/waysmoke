@@ -66,7 +66,7 @@ where
         cursor_position: Point,
         renderer: &Renderer,
         clipboard: &mut dyn Clipboard,
-        messages: &mut Vec<Message>,
+        shell: &mut Shell<'_, Message>,
     ) -> event::Status {
         self.content.on_event(
             event,
@@ -74,21 +74,35 @@ where
             cursor_position,
             renderer,
             clipboard,
-            messages,
+            shell,
         )
+    }
+
+    fn mouse_interaction(
+        &self,
+        layout: Layout<'_>,
+        cursor_position: Point,
+        viewport: &Rectangle,
+    ) -> mouse::Interaction {
+        self.content.mouse_interaction(layout, cursor_position, viewport)
     }
 
     fn draw(
         &self,
         renderer: &mut Renderer,
-        defaults: &Renderer::Defaults,
+        style: &renderer::Style,
         layout: Layout<'_>,
         cursor_position: Point,
         viewport: &Rectangle,
-    ) -> Renderer::Output {
-        let child_layout = layout.children().next().unwrap();
-        self.state.set(child_layout.bounds());
-        renderer.draw(defaults, cursor_position, viewport, &self.content, child_layout)
+    ) {
+        self.state.set(layout.bounds());
+        self.content.draw(
+            renderer,
+            style,
+            layout.children().next().unwrap(),
+            cursor_position,
+            viewport,
+        )
     }
 
     fn hash_layout(&self, state: &mut Hasher) {
@@ -99,17 +113,6 @@ where
     }
 }
 
-pub trait Renderer: iced_native::Renderer {
-    fn draw<Message>(
-        &mut self,
-        defaults: &Self::Defaults,
-        cursor_position: Point,
-        viewport: &Rectangle,
-        content: &Element<'_, Message, Self>,
-        content_layout: Layout<'_>,
-    ) -> Self::Output;
-}
-
 impl<'a, Message, Renderer> From<GetRegion<'a, Message, Renderer>> for Element<'a, Message, Renderer>
 where
     Renderer: 'a + self::Renderer,
@@ -117,21 +120,5 @@ where
 {
     fn from(x: GetRegion<'a, Message, Renderer>) -> Element<'a, Message, Renderer> {
         Element::new(x)
-    }
-}
-
-impl<B> Renderer for iced_graphics::Renderer<B>
-where
-    B: iced_graphics::Backend,
-{
-    fn draw<Message>(
-        &mut self,
-        defaults: &iced_graphics::Defaults,
-        cursor_position: Point,
-        viewport: &Rectangle,
-        content: &Element<'_, Message, Self>,
-        content_layout: Layout<'_>,
-    ) -> Self::Output {
-        content.draw(self, defaults, content_layout, cursor_position, viewport)
     }
 }

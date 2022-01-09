@@ -112,20 +112,18 @@ impl PowerService {
         {
             let state = state.clone();
             let notifier = notifier.clone();
-            display_device
-                .connect_local("g-properties-changed", true, move |args| {
-                    let new_props = args[1]
-                        .get::<glib::Variant>()
-                        .unwrap()
-                        .get::<HashMap<String, glib::Variant>>()
-                        .unwrap();
-                    if let Some(ref mut total) = state.borrow_mut().total {
-                        total.update(new_props);
-                    }
-                    notifier.notify(usize::MAX);
-                    None
-                })
-                .unwrap();
+            let _sid = display_device.connect_local("g-properties-changed", true, move |args| {
+                let new_props = args[1]
+                    .get::<glib::Variant>()
+                    .unwrap()
+                    .get::<HashMap<String, glib::Variant>>()
+                    .unwrap();
+                if let Some(ref mut total) = state.borrow_mut().total {
+                    total.update(new_props);
+                }
+                notifier.notify(usize::MAX);
+                None
+            });
         }
 
         PowerService {

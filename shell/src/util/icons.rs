@@ -8,13 +8,13 @@ pub fn icon_from_path(path: linicon::IconPath) -> ImageHandle {
 }
 
 pub fn icon_widget<'a, Message>(icon: ImageHandle, size: u16) -> Element<'a, Message> {
-    use iced_native::{Image, Length, Svg};
+    use iced_native::{widget, Length};
     match icon {
-        ImageHandle::Raster(h) => Image::new(h)
+        ImageHandle::Raster(h) => widget::Image::new(h)
             .width(Length::Units(size))
             .height(Length::Units(size))
             .into(),
-        ImageHandle::Vector(h) => Svg::new(h)
+        ImageHandle::Vector(h) => widget::Svg::new(h)
             .width(Length::Units(size))
             .height(Length::Units(size))
             .into(),

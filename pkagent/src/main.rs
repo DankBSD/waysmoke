@@ -1,5 +1,6 @@
 use futures::{channel::mpsc, prelude::*};
 use glib::clone;
+use iced_native::widget::{self, *};
 use std::{
     cell::{Cell, RefCell},
     collections::HashMap,
@@ -266,17 +267,17 @@ enum Msg {
 
 struct AuthDialog {
     st: Rc<AuthRunState>,
-    input: iced_native::text_input::State,
+    input: widget::text_input::State,
     input_val: String,
-    cancel_btn: iced_native::button::State,
-    submit_btn: iced_native::button::State,
+    cancel_btn: widget::button::State,
+    submit_btn: widget::button::State,
 }
 
 impl AuthDialog {
     pub fn new(st: Rc<AuthRunState>) -> AuthDialog {
         AuthDialog {
             st,
-            input: iced_native::text_input::State::focused(),
+            input: widget::text_input::State::focused(),
             input_val: "".to_string(),
             cancel_btn: Default::default(),
             submit_btn: Default::default(),

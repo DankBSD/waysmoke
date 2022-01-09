@@ -57,7 +57,7 @@ where
     }
 
     fn layout(&self, renderer: &Renderer, limits: &layout::Limits) -> layout::Node {
-        let content = self.content.layout(renderer, &limits.loose());
+        let content = self.content.layout(renderer, &limits);
         let size = limits.resolve(content.size());
         layout::Node::with_children(size, vec![content])
     }
@@ -69,18 +69,18 @@ where
         cursor_position: Point,
         renderer: &Renderer,
         clipboard: &mut dyn Clipboard,
-        messages: &mut Vec<Message>,
+        shell: &mut Shell<'_, Message>,
     ) -> event::Status {
         let bounds = layout.bounds();
         let is_mouse_over = bounds.contains(cursor_position);
         if is_mouse_over && !self.state.is_hovered {
             if let Some(ref msg) = self.pointer_enter {
-                messages.push(msg.clone());
+                shell.publish(msg.clone());
             }
         }
         if !is_mouse_over && self.state.is_hovered {
             if let Some(ref msg) = self.pointer_leave {
-                messages.push(msg.clone());
+                shell.publish(msg.clone());
             }
         }
         self.state.is_hovered = is_mouse_over;
@@ -91,25 +91,28 @@ where
             cursor_position,
             renderer,
             clipboard,
-            messages,
+            shell,
         )
+    }
+
+    fn mouse_interaction(
+        &self,
+        layout: Layout<'_>,
+        cursor_position: Point,
+        viewport: &Rectangle,
+    ) -> mouse::Interaction {
+        self.content.mouse_interaction(layout, cursor_position, viewport)
     }
 
     fn draw(
         &self,
         renderer: &mut Renderer,
-        defaults: &Renderer::Defaults,
+        style: &renderer::Style,
         layout: Layout<'_>,
         cursor_position: Point,
         viewport: &Rectangle,
-    ) -> Renderer::Output {
-        renderer.draw(
-            defaults,
-            cursor_position,
-            viewport,
-            &self.content,
-            layout.children().next().unwrap(),
-        )
+    ) {
+        self.content.draw(renderer, style, layout, cursor_position, viewport)
     }
 
     fn hash_layout(&self, state: &mut Hasher) {
@@ -120,17 +123,6 @@ where
     }
 }
 
-pub trait Renderer: iced_native::Renderer {
-    fn draw<Message>(
-        &mut self,
-        defaults: &Self::Defaults,
-        cursor_position: Point,
-        viewport: &Rectangle,
-        content: &Element<'_, Message, Self>,
-        content_layout: Layout<'_>,
-    ) -> Self::Output;
-}
-
 impl<'a, Message, Renderer> From<AddEventListener<'a, Message, Renderer>> for Element<'a, Message, Renderer>
 where
     Renderer: 'a + self::Renderer,
@@ -138,21 +130,5 @@ where
 {
     fn from(x: AddEventListener<'a, Message, Renderer>) -> Element<'a, Message, Renderer> {
         Element::new(x)
-    }
-}
-
-impl<B> Renderer for iced_graphics::Renderer<B>
-where
-    B: iced_graphics::Backend,
-{
-    fn draw<Message>(
-        &mut self,
-        defaults: &iced_graphics::Defaults,
-        cursor_position: Point,
-        viewport: &Rectangle,
-        content: &Element<'_, Message, Self>,
-        content_layout: Layout<'_>,
-    ) -> Self::Output {
-        content.draw(self, defaults, content_layout, cursor_position, viewport)
     }
 }

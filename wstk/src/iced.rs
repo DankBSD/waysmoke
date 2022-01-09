@@ -1,6 +1,6 @@
 use iced_graphics::window::Compositor;
 pub use iced_native::Rectangle;
-use iced_native::{keyboard, mouse, Cache, Damage, Point, Size, UserInterface};
+use iced_native::{keyboard, mouse, Cache, Damage, Point, Renderer, Size, UserInterface};
 use iced_wgpu::window::Compositor as WgpuCompositor;
 
 use std::{
@@ -314,27 +314,26 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
         );
 
         if self.messages.is_empty() {
-            let (primitive, mi) = user_interface.draw(&mut self.renderer, self.cursor_position);
-            let dmg = self.prev_prim.damage(&primitive);
-            self.prev_prim = primitive.clone();
+            let mi = user_interface.draw(&mut self.renderer, self.cursor_position);
+            let next_prim = self.renderer.damage_token();
+            let dmg = self.prev_prim.damage(&next_prim);
+            self.prev_prim = next_prim;
             if dmg == None || dmg.map(|x| x.len()).unwrap_or(0) == 0 {
                 self.cache = user_interface.into_cache();
                 self.update_input_region();
                 return;
             }
-            let inter = self
-                .compositor
-                .draw::<String>(
+            self.compositor
+                .present::<String>(
                     &mut self.renderer,
                     &mut self.gpu_surface,
                     &viewport,
                     iced_core::Color::TRANSPARENT,
-                    &(primitive, mi),
                     &[],
                 )
                 .unwrap();
             self.cache = user_interface.into_cache();
-            self.apply_mouse_interaction(inter);
+            self.apply_mouse_interaction(mi);
         } else {
             // iced-winit says we are forced to rebuild twice
             let temp_cache = user_interface.into_cache();
@@ -346,26 +345,25 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
 
             let mut user_interface =
                 UserInterface::build(self.surface.view(), self.size, temp_cache, &mut self.renderer);
-            let (primitive, mi) = user_interface.draw(&mut self.renderer, self.cursor_position);
-            let dmg = self.prev_prim.damage(&primitive);
-            self.prev_prim = primitive.clone();
+            let mi = user_interface.draw(&mut self.renderer, self.cursor_position);
+            let next_prim = self.renderer.damage_token();
+            let dmg = self.prev_prim.damage(&next_prim);
+            self.prev_prim = next_prim;
             if dmg == None || dmg.map(|x| x.len()).unwrap_or(0) == 0 {
                 self.cache = user_interface.into_cache();
                 return;
             }
-            let inter = self
-                .compositor
-                .draw::<String>(
+            self.compositor
+                .present::<String>(
                     &mut self.renderer,
                     &mut self.gpu_surface,
                     &viewport,
                     iced_core::Color::TRANSPARENT,
-                    &(primitive, mi),
                     &[],
                 )
                 .unwrap();
             self.cache = user_interface.into_cache();
-            self.apply_mouse_interaction(inter);
+            self.apply_mouse_interaction(mi);
         }
         self.update_input_region();
     }
