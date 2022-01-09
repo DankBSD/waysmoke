@@ -246,7 +246,6 @@ impl<T: DesktopSurface + IcedSurface> IcedInstance<T> {
             if let Some(ref rects) = reg {
                 let wlreg = self.parent.create_region();
                 for rect in rects.iter() {
-                    use std::convert::TryInto;
                     wlreg.add(
                         rect.x.try_into().unwrap(),
                         rect.y.try_into().unwrap(),

@@ -2448,7 +2448,7 @@ dependencies = [
 
 [[package]]
 name = "waysmoke-pkagent"
-version = "2020.5.0"
+version = "2021.1.0"
 dependencies = [
  "fragile",
  "futures",
@@ -2461,7 +2461,7 @@ dependencies = [
 
 [[package]]
 name = "waysmoke-shell"
-version = "2020.5.0"
+version = "2021.1.0"
 dependencies = [
  "futures",
  "gio",
