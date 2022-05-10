@@ -8,8 +8,8 @@ edition = "2021"
 [dependencies]
 fragile = "1"
 futures = "0.3"
-glib = "=0.15.0"
-gio = { version = "=0.15.0", features = ["v2_50"] }
+glib = "=0.16.0"
+gio = "=0.16.0"
 polkit = "0"
 polkit-agent = "0"
 

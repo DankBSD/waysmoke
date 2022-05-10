@@ -8,8 +8,8 @@ edition = "2021"
 [dependencies]
 lazy_static = "1"
 futures = "0.3"
-glib = "=0.15.0"
-gio = { version = "=0.15.0", features = ["v2_50"] }
+glib = "=0.16.0"
+gio = "=0.16.0"
 linicon = { version = "2", default-features = false }
 tree_magic_mini = "3"
 wgpu = "0.12"

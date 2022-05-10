@@ -1,7 +1,7 @@
 //! A way to track layout regions of particular areas
 
 use iced_native::*;
-use std::{cell::Cell, hash::Hash};
+use std::cell::Cell;
 
 pub struct GetRegion<'a, Message, Renderer: self::Renderer> {
     // The Cell helps both with the immutable &self in layout(), and with multi-borrows in the consumer
@@ -83,8 +83,10 @@ where
         layout: Layout<'_>,
         cursor_position: Point,
         viewport: &Rectangle,
+        renderer: &Renderer,
     ) -> mouse::Interaction {
-        self.content.mouse_interaction(layout, cursor_position, viewport)
+        self.content
+            .mouse_interaction(layout, cursor_position, viewport, renderer)
     }
 
     fn draw(
@@ -103,13 +105,6 @@ where
             cursor_position,
             viewport,
         )
-    }
-
-    fn hash_layout(&self, state: &mut Hasher) {
-        struct Marker;
-        std::any::TypeId::of::<Marker>().hash(state);
-
-        self.content.hash_layout(state);
     }
 }
 

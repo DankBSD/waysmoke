@@ -2,7 +2,6 @@
 //! the equivalent of anything.addEventListener('mouseover', ..) :P
 
 use iced_native::*;
-use std::hash::Hash;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct State {
@@ -100,8 +99,10 @@ where
         layout: Layout<'_>,
         cursor_position: Point,
         viewport: &Rectangle,
+        renderer: &Renderer,
     ) -> mouse::Interaction {
-        self.content.mouse_interaction(layout, cursor_position, viewport)
+        self.content
+            .mouse_interaction(layout, cursor_position, viewport, renderer)
     }
 
     fn draw(
@@ -113,13 +114,6 @@ where
         viewport: &Rectangle,
     ) {
         self.content.draw(renderer, style, layout, cursor_position, viewport)
-    }
-
-    fn hash_layout(&self, state: &mut Hasher) {
-        struct Marker;
-        std::any::TypeId::of::<Marker>().hash(state);
-
-        self.content.hash_layout(state);
     }
 }
 

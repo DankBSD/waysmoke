@@ -1,6 +1,6 @@
 use iced_graphics::window::Compositor;
 pub use iced_native::Rectangle;
-use iced_native::{keyboard, mouse, Cache, Damage, Point, Renderer, Size, UserInterface};
+use iced_native::{keyboard, mouse, user_interface::Cache, Damage, Point, Renderer, Size, UserInterface};
 use iced_wgpu::window::Compositor as WgpuCompositor;
 
 use std::{

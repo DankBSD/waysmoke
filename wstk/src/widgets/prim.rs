@@ -1,7 +1,6 @@
 //! Simple widget for directly rendering a primitive
 
 use iced_native::*;
-use std::hash::Hash;
 
 pub struct Prim {
     primitive: iced_graphics::Primitive,
@@ -63,6 +62,7 @@ where
         _layout: Layout<'_>,
         _cursor_position: Point,
         _viewport: &Rectangle,
+        _renderer: &iced_graphics::Renderer<Backend>,
     ) -> mouse::Interaction {
         mouse::Interaction::default()
     }
@@ -79,14 +79,6 @@ where
         renderer.with_translation(Vector::new(b.x, b.y), |renderer| {
             renderer.draw_primitive(self.primitive.clone());
         });
-    }
-
-    fn hash_layout(&self, state: &mut Hasher) {
-        struct Marker;
-        std::any::TypeId::of::<Marker>().hash(state);
-
-        self.width.hash(state);
-        self.height.hash(state);
     }
 }
 
