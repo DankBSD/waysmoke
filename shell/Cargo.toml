@@ -1,6 +1,6 @@
 [package]
 name = "waysmoke-shell"
-version = "2021.1.0"
+version = "2022.1.0"
 license = "Unlicense"
 authors = ["Val Packett <val@packett.cool>"]
 edition = "2021"
